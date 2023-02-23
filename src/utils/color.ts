@@ -1,0 +1,9 @@
+export const COLOR = {
+  WHITE: '#FFFFFF',
+  BLACK: 'black',
+  lIGHTGREEN: '#50E2E1',
+  BACKGROUND: '#F3F8F8',
+  TEXTGREY: '#B1B2B2',
+  DESCRIPTIONTEXT: '#8E8E8F',
+  SEPARATOR: '#EAEAE9',
+};

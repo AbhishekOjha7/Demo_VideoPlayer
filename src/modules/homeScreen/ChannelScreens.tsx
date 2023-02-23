@@ -4,7 +4,7 @@ import React from 'react';
 const ChannelScreens = () => {
   return (
     <SafeAreaView>
-      <Text>ChannelScreens</Text>
+      <Text style={{fontFamily: 'Poppins-Bold'}}>ChannelScreens</Text>
     </SafeAreaView>
   );
 };

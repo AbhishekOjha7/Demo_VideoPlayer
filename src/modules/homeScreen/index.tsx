@@ -5,17 +5,19 @@ import HeaderComponents from '../../components/headerComponents';
 
 const HomeScreen = () => {
   return (
-    <SafeAreaView style={styles.container}>
-      <HeaderComponents />
+    <View style={styles.container}>
+      <SafeAreaView />
+      <HeaderComponents HeaderTxt={'Favorites'} />
       <MyTabs />
-    </SafeAreaView>
+    </View>
   );
 };
 
-export default HomeScreen;
+export default React.memo(HomeScreen);
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'white',
   },
 });

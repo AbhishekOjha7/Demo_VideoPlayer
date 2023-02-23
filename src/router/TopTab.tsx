@@ -3,42 +3,64 @@ import {NavigationContainer} from '@react-navigation/native';
 import ArticlesScreen from '../modules/homeScreen/ArticlesScreen';
 import ChannelScreens from '../modules/homeScreen/ChannelScreens';
 import VideosScreen from '../modules/homeScreen/VideosScreen';
-import {View, Text} from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
+import {normalize} from '../utils/dimensions';
+import {COLOR} from '../utils/color';
+import {STRINGS} from '../utils/string';
 const Tab = createMaterialTopTabNavigator();
 
 export default function MyTabs() {
   return (
     <Tab.Navigator
-      sceneContainerStyle={{backgroundColor: 'transparent'}}
       screenOptions={({route}) => ({
-        tabBarStyle: {backgroundColor: 'transparent'},
+        tabBarIndicatorStyle: {
+          width: 0,
+        },
+        tabBarPressColor: 'white',
         tabBarLabel: ({focused}) => {
           return (
-            <Text
-              style={
-                focused
-                  ? {
-                      fontSize: 18,
-                      color: 'white',
-                      backgroundColor: '#52E2E1',
-                      borderWidth: 0,
-                      borderRadius: 20,
-                      //   width: '120%',
-                      //   height: 20,
-                      textAlign: 'center',
-                    }
-                  : {fontSize: 18, color: 'black'}
-              }>
-              {route.name}
-            </Text>
+            <View
+              style={[
+                styles.toptabView,
+                {backgroundColor: focused ? COLOR.lIGHTGREEN : COLOR.WHITE},
+              ]}>
+              <Text
+                style={
+                  focused
+                    ? {
+                        fontSize: 14,
+                        lineHeight: 20,
+                        color: COLOR.WHITE,
+                        textAlign: 'center',
+                        fontFamily: 'Poppins-SemiBold',
+                      }
+                    : {
+                        fontSize: 14,
+                        lineHeight: 20,
+                        color: 'black',
+                        fontFamily: 'Poppins-SemiBold',
+                      }
+                }>
+                {route.name}
+              </Text>
+            </View>
           );
         },
+        swipeEnabled: false,
         // tabBarIndicatorStyle: {backgroundColor: 'red'},
         // tabBarLabelStyle: {color: '#fff'},
       })}>
-      <Tab.Screen name="Channels" component={ChannelScreens} />
-      <Tab.Screen name="Videos" component={VideosScreen} />
-      <Tab.Screen name="Articles" component={ArticlesScreen} />
+      <Tab.Screen name={STRINGS.TOPTAB.Channels} component={ChannelScreens} />
+      <Tab.Screen name={STRINGS.TOPTAB.Videos} component={VideosScreen} />
+      <Tab.Screen name={STRINGS.TOPTAB.Articles} component={ArticlesScreen} />
     </Tab.Navigator>
   );
 }
+const styles = StyleSheet.create({
+  toptabView: {
+    width: normalize(100),
+    alignItems: 'center',
+    padding: normalize(6),
+    borderRadius: normalize(20),
+  },
+});
