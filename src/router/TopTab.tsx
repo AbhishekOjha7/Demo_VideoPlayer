@@ -8,10 +8,10 @@ import {normalize} from '../utils/dimensions';
 import {COLOR} from '../utils/color';
 import {STRINGS} from '../utils/string';
 const Tab = createMaterialTopTabNavigator();
-
 export default function MyTabs() {
   return (
     <Tab.Navigator
+      initialRouteName={STRINGS.TOPTAB.Videos}
       screenOptions={({route}) => ({
         tabBarIndicatorStyle: {
           width: 0,
@@ -24,23 +24,7 @@ export default function MyTabs() {
                 styles.toptabView,
                 {backgroundColor: focused ? COLOR.lIGHTGREEN : COLOR.WHITE},
               ]}>
-              <Text
-                style={
-                  focused
-                    ? {
-                        fontSize: 14,
-                        lineHeight: 20,
-                        color: COLOR.WHITE,
-                        textAlign: 'center',
-                        fontFamily: 'Poppins-SemiBold',
-                      }
-                    : {
-                        fontSize: 14,
-                        lineHeight: 20,
-                        color: 'black',
-                        fontFamily: 'Poppins-SemiBold',
-                      }
-                }>
+              <Text style={focused ? styles.active : styles.inActive}>
                 {route.name}
               </Text>
             </View>
@@ -62,5 +46,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: normalize(6),
     borderRadius: normalize(20),
+  },
+  active: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: COLOR.WHITE,
+    textAlign: 'center',
+    fontFamily: 'Poppins-SemiBold',
+  },
+  inActive: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: 'black',
+    fontFamily: 'Poppins-SemiBold',
   },
 });

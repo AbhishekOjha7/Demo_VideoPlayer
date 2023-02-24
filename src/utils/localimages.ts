@@ -10,4 +10,9 @@ export default {
   favoriteIcon: require(`${DEFAULTPATH}favouriteIcon.png`),
   moneyIcon: require(`${DEFAULTPATH}moenyIcon.png`),
   expand: require(`${DEFAULTPATH}expand.png`),
+  forward: require(`${DEFAULTPATH}forward.png`),
+  backward: require(`${DEFAULTPATH}backward.png`),
+  fullscreen: require(`${DEFAULTPATH}fullscreen.png`),
+  pauseIcon: require(`${DEFAULTPATH}pause_button.png`),
+  tripleDot: require(`${DEFAULTPATH}tripleDot.png`),
 };

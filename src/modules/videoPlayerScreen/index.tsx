@@ -9,27 +9,34 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import VideoPlayerComponent from '../../components/videoPlayerComponent';
 import {normalize} from '../../utils/dimensions';
 import {COLOR} from '../../utils/color';
 import {Icons, videos} from '../../utils/dummyData';
-import SeparatorLine from '../../components/separatorComponent';
-import CircleImageComponent from '../../components/circleImageComponent';
 import localimages from '../../utils/localimages';
-import CustomButton from '../../components/subscribeButtonComponent';
-import {useRoute} from '@react-navigation/native';
 import fonts from '../../utils/fonts';
+import Share from 'react-native-share';
 import CardComponent from '../../components/cardComponent';
+import {STRINGS} from '../../utils/string';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const VideoPlayer = ({route}: any) => {
   const {title, description, sources} = route.params;
+  const [showVideo, unShowVideo] = useState(sources);
+  const [mytitle, setTitle] = useState(title);
+
   console.log('====>', title, description, sources);
+  let data = videos.filter(item => item.sources[0] !== showVideo).splice(0, 5);
 
   const onRender = ({item}: any) => {
+    console.log(item.sources[0]);
     return (
       <CardComponent
+        onPress={() => {
+          unShowVideo(item.sources[0]);
+          setTitle(item?.title);
+        }}
         thumb={item?.thumb}
         title={item.title}
         subtitle={item?.subtitle}
@@ -37,13 +44,25 @@ const VideoPlayer = ({route}: any) => {
       />
     );
   };
+  const myCustomShare = async () => {
+    const shareOptions = {
+      message: title,
+      url: sources,
+    };
+    try {
+      const shareResponse = await Share.open(shareOptions);
+    } catch (error) {
+      console.log('errror', error);
+    }
+  };
+
   const _listHeaderComponent = () => {
     return (
       <>
         <View style={styles.listHeaderView}>
-          <Text style={styles.titleTxt}>{title}</Text>
+          <Text style={styles.titleTxt}>{mytitle}</Text>
           <Text style={styles.viewsTxt}>
-            {'94k views'} {'\u2022'} {'3 days ago'}
+            {STRINGS.LABEL.views} {STRINGS.LABEL.unicode} {STRINGS.LABEL.days}
           </Text>
           <Text style={styles.descriptionTXt} numberOfLines={3}>
             {description}
@@ -51,6 +70,7 @@ const VideoPlayer = ({route}: any) => {
           <View style={styles.iconsView}>
             {Icons.map((item, index) => (
               <TouchableOpacity
+                onPress={index === 2 ? myCustomShare : () => {}}
                 key={index.toString()}
                 style={styles.iconsTouchable}>
                 <Image source={item.img} />
@@ -63,33 +83,37 @@ const VideoPlayer = ({route}: any) => {
         <View style={styles.subscriberView}>
           <Image style={styles.subscriberIcon} source={localimages.girlIcon} />
           <View style={styles.subscriberHead}>
-            <Text numberOfLines={1}>{'Technical Guruji'}</Text>
-            <Text numberOfLines={1} style={styles.subscribetxt}>
-              {'15k Subscribers'}
+            <Text style={styles.technicalText}>{STRINGS.LABEL.subsriber}</Text>
+            <Text style={styles.subscribetxt}>
+              {STRINGS.LABEL.totalsubscriber}
             </Text>
           </View>
           <TouchableOpacity activeOpacity={0.8} style={styles.subscribeButton}>
-            <Text>{'Subscribe'}</Text>
+            <Text style={styles.subscribebuttonTxt}>
+              {STRINGS.LABEL.buttonTxt}
+            </Text>
           </TouchableOpacity>
         </View>
         <View style={styles.commentsView}>
           <View style={styles.commentsInner}>
             <View style={styles.noOfComments}>
-              <Text>{'Comments'}</Text>
-              <Text style={styles.commentsTxt}>{'32'}</Text>
+              <Text style={styles.commentsText}>{STRINGS.LABEL.comments}</Text>
+              <Text style={styles.commentsTxt}>
+                {STRINGS.LABEL.totalCommnets}
+              </Text>
             </View>
             <Image source={localimages.expand} />
           </View>
           <View style={styles.userCommentView}>
             <Image style={styles.commentsUser} source={localimages.girlIcon} />
             <View style={styles.descriptionComment}>
-              <Text style={{}} numberOfLines={2}>
+              <Text style={styles.commentsUserTxt} numberOfLines={2}>
                 {description}
               </Text>
             </View>
           </View>
         </View>
-        <Text style={styles.similarView}>{'Similar Videos'}</Text>
+        <Text style={styles.similarView}>{STRINGS.LABEL.Similar}</Text>
       </>
     );
   };
@@ -97,16 +121,13 @@ const VideoPlayer = ({route}: any) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.videoContainer}>
-        <VideoPlayerComponent videoUrl={sources} />
+        <VideoPlayerComponent videoUrl={showVideo} />
       </View>
-
       <View>
         <FlatList
-          data={videos}
-          style={{
-            height: windowHeight - normalize(249),
-          }}
-          contentContainerStyle={{paddingBottom: normalize(10)}}
+          data={data}
+          style={styles.FlatListStyle}
+          contentContainerStyle={styles.contentContainerStyle}
           renderItem={onRender}
           ListHeaderComponent={_listHeaderComponent}
         />
@@ -186,7 +207,9 @@ const styles = StyleSheet.create({
     marginHorizontal: normalize(14),
   },
   subscribetxt: {
-    marginTop: 2,
+    marginTop: normalize(2),
+    color: COLOR.DESCRIPTIONTEXT,
+    fontFamily: fonts.MEDIUM,
   },
   subscribeButton: {
     backgroundColor: COLOR.lIGHTGREEN,
@@ -226,7 +249,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: 0,
     flex: 1,
-    justifyContent: 'space-evenly',
+    // justifyContent: 'space-evenly',
     alignItems: 'center',
     marginHorizontal: normalize(14),
   },
@@ -235,5 +258,31 @@ const styles = StyleSheet.create({
     fontFamily: fonts.EXTRABOLD,
     paddingHorizontal: normalize(20),
     paddingTop: normalize(16),
+  },
+  subscribebuttonTxt: {
+    color: COLOR.WHITE,
+    fontSize: 14,
+    fontFamily: fonts.MEDIUM,
+  },
+  commentsText: {
+    fontSize: 14,
+    fontFamily: fonts.SEMIBOLD,
+    color: COLOR.BLACK,
+  },
+  commentsUserTxt: {
+    color: COLOR.TEXTGREY,
+    fontFamily: fonts.MEDIUM,
+    fontSize: 12,
+  },
+  technicalText: {
+    fontSize: 16,
+    fontFamily: fonts.SEMIBOLD,
+    color: COLOR.BLACK,
+  },
+  FlatListStyle: {
+    height: windowHeight - normalize(249),
+  },
+  contentContainerStyle: {
+    paddingBottom: normalize(10),
   },
 });

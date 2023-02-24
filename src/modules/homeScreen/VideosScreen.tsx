@@ -15,6 +15,8 @@ import {COLOR} from '../../utils/color';
 import {useNavigation} from '@react-navigation/native';
 import {videos} from '../../utils/dummyData';
 import CardComponent from '../../components/cardComponent';
+import {STRINGS} from '../../utils/string';
+
 const VideosScreen = () => {
   const [data, setData] = React.useState(videos.slice(0, 3));
   const navigation = useNavigation<any>();
@@ -52,8 +54,8 @@ const VideosScreen = () => {
       bounces={false}
       data={data}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{paddingBottom: normalize(20)}}
-      style={{marginBottom: normalize(20)}}
+      contentContainerStyle={styles.contentStyle}
+      style={styles.flatlistStyle}
       renderItem={_renderItem}
       onEndReached={addData}
       onEndReachedThreshold={0.5}
@@ -68,28 +70,33 @@ const VideosScreen = () => {
 export default React.memo(VideosScreen);
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLOR.BACKGROUND,
+  contentStyle: {
+    paddingBottom: normalize(20),
   },
-  cardContainer: {
-    alignSelf: 'center',
-    borderRadius: normalize(10),
-    backgroundColor: 'white',
-    marginVertical: normalize(10),
-    // width: normalize(335),
-    // width: '90%',
-    height: normalize(325),
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.27,
-    shadowRadius: 4.65,
-
-    elevation: 6,
+  flatlistStyle: {
+    marginBottom: normalize(20),
   },
+  // container: {
+  //   flex: 1,
+  //   backgroundColor: COLOR.BACKGROUND,
+  // },
+  // cardContainer: {
+  //   alignSelf: 'center',
+  //   borderRadius: normalize(10),
+  //   backgroundColor: 'white',
+  //   marginVertical: normalize(10),
+  //   // width: normalize(335),
+  //   // width: '90%',
+  //   height: normalize(325),
+  //   shadowColor: '#000',
+  //   shadowOffset: {
+  //     width: 0,
+  //     height: 3,
+  //   },
+  //   shadowOpacity: 0.27,
+  //   shadowRadius: 4.65,
+  //   elevation: 6,
+  // },
   // cardImg: {
   //   height: normalize(200),
   //   width: normalize(335),
