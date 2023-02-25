@@ -120,9 +120,9 @@ const VideoPlayer = ({route}: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.videoContainer}>
-        <VideoPlayerComponent videoUrl={showVideo} />
-      </View>
+      {/* <View style={styles.videoContainer}> */}
+      <VideoPlayerComponent videoUrl={showVideo} />
+      {/* </View> */}
       <View>
         <FlatList
           data={data}
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     color: COLOR.BLACK,
   },
   FlatListStyle: {
-    height: windowHeight - normalize(249),
+    height: windowHeight - normalize(250),
   },
   contentContainerStyle: {
     paddingBottom: normalize(10),
