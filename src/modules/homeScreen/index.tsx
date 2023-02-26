@@ -2,6 +2,7 @@ import {SafeAreaView, StyleSheet, View} from 'react-native';
 import React from 'react';
 import MyTabs from '../../router/TopTab';
 import HeaderComponents from '../../components/headerComponents';
+import {COLOR} from '../../utils/color';
 
 const HomeScreen = () => {
   return (
@@ -18,6 +19,6 @@ export default React.memo(HomeScreen);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: COLOR.WHITE,
   },
 });

@@ -1,23 +1,34 @@
 import {
+  Dimensions,
   Image,
+  Platform,
   SafeAreaView,
+  StatusBar,
   StyleSheet,
   Text,
+  Touchable,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Video from 'react-native-video';
 import {normalize} from '../utils/dimensions';
 import localimages from '../utils/localimages';
 import Slider from '@react-native-community/slider';
 import {COLOR} from '../utils/color';
+import Orientation from 'react-native-orientation-locker';
+import {useNavigation} from '@react-navigation/native';
+const height = Dimensions.get('window').height;
+const width = Dimensions.get('window').width;
 const videoRef = React.createRef<any>();
 const VideoPlayerComponent = ({videoUrl}: any) => {
   const [play, setPlay] = useState(true);
-  const [showControl, setShowControl] = useState(true);
+  const [showControl, setShowControl] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [currOrientation, setOrientation] = useState('PORTRAIT');
+  const navigation = useNavigation<any>();
 
   const secondsToHHMMSS = (seconds: number | string) => {
     seconds = Number(seconds);
@@ -30,27 +41,49 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
     return `${hrs}${mins}${scnds}`;
   };
 
-  const handlePlay = () => {
-    setPlay(!play);
+  useEffect(() => {
+    Orientation.getOrientation(orientation => {
+      console.log(orientation.includes('LANDSCAPE'));
+      if (orientation.includes('LANDSCAPE')) {
+        Orientation.lockToPortrait();
+      }
+    });
+    Orientation.addLockListener(orientation => setOrientation(orientation));
+    return () => {
+      Orientation.removeLockListener(handleFullScreen);
+    };
+  }, []);
+
+  const handleFullScreen = () => {
+    setFullscreen(!fullscreen);
+    console.log('curreOtnsdf-->', currOrientation);
+    if (currOrientation.includes('LANDSCAPE')) {
+      Orientation.lockToPortrait();
+    } else {
+      Orientation.lockToLandscape();
+    }
+    console.log('currrrr', currOrientation);
   };
 
-  // const handlePlayPause = () => {
-  //   if (play) {
-  //     setPlay(false);
-  //     setShowControl(true);
-  //     return;
-  //   }
-  //   setTimeout(() => setShowControl(false), 2000);
-  //   setPlay(true);
-  // };
-
+  const handlePlay = () => {
+    console.log('hancdlll');
+    setPlay(!play);
+    // if (play) {
+    //   setPlay(false);
+    //   setShowControl(true);
+    //   return;
+    // }
+    // setPlay(true);
+    // setTimeout(() => {
+    //   setShowControl(true);
+    // }, 3000);
+  };
   const skipBackward = () => {
     videoRef?.current?.seek(currentTime - 10);
     setCurrentTime(currentTime - 10);
   };
 
   const skipForward = () => {
-    console.log(currentTime + 10, currentTime);
     videoRef?.current?.seek(currentTime + 10);
     setCurrentTime(currentTime + 10);
   };
@@ -58,6 +91,7 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
   const onEnd = () => {
     setPlay(true);
     videoRef.current.seek(0);
+    setCurrentTime(0);
   };
   const onProgress = (data: any) => {
     setCurrentTime(data.currentTime);
@@ -66,116 +100,125 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
     setDuration(obj.duration);
     setCurrentTime(obj.currentTime);
   };
+  const handleIcons = () => {
+    console.log('++++++', showControl);
+    setShowControl(true);
+    setTimeout(() => {
+      setShowControl(false);
+    }, 3000);
+  };
+
+  const NavigateBack = () => {
+    navigation.goBack();
+  };
 
   return (
-    <View style={styles.container}>
+    <TouchableOpacity onPress={handleIcons} activeOpacity={1}>
       <Video
+        // rate={play ? 1.0 : 0.0}
         ref={videoRef}
         source={{uri: videoUrl}}
-        style={styles.video}
+        style={fullscreen ? styles.fullscreeennns : styles.video}
         controls={false}
-        paused={play}
+        muted={true}
+        paused={!play}
         onProgress={onProgress}
         onLoad={onLoad}
         resizeMode={'cover'}
         onEnd={onEnd}
+        fullscreen={fullscreen}
+        fullscreenOrientation={'landscape'}
       />
 
-      <View style={styles.controllerView}>
-        <TouchableOpacity style={styles.leftIcon}>
-          <Image style={styles.backicon} source={localimages.left_arrow} />
-        </TouchableOpacity>
+      {showControl && (
+        <View style={styles.controlTopView}>
+          <TouchableOpacity style={styles.leftIcon} onPress={NavigateBack}>
+            <Image style={styles.backicon} source={localimages.left_arrow} />
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={skipBackward}>
-          <Image
-            resizeMode="contain"
-            style={styles.backWardIcon}
-            source={localimages.backward}
+          <View style={styles.controllerView}>
+            <TouchableOpacity onPress={skipBackward}>
+              <Image
+                resizeMode="contain"
+                style={styles.backWardIcon}
+                source={localimages.backward}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handlePlay}>
+              {play ? (
+                <Image
+                  resizeMode="contain"
+                  style={styles.pauseIcon}
+                  source={localimages.pauseIcon}
+                />
+              ) : (
+                <Image
+                  resizeMode="contain"
+                  style={styles.playIcon}
+                  source={localimages.playIcon}
+                />
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.playIcon} onPress={skipForward}>
+              <Image
+                resizeMode="contain"
+                style={styles.forwardIcon}
+                source={localimages.forward}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <Slider
+            style={styles.sliderStyle}
+            value={currentTime}
+            tapToSeek
+            minimumValue={0}
+            maximumValue={duration}
+            minimumTrackTintColor={COLOR.lIGHTGREEN}
+            maximumTrackTintColor={COLOR.WHITE}
+            thumbTintColor={COLOR.lIGHTGREEN}
+            // thumbImage={require('../assets/images/dot.png')}
+            onSlidingComplete={value => {
+              value = Array.isArray(value) ? value[0] : value;
+              setCurrentTime(value);
+              videoRef.current.seek(value);
+            }}
           />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handlePlay}>
-          {!play ? (
+
+          <View style={styles.timerView}>
+            <Text style={{color: COLOR.WHITE}}>
+              {secondsToHHMMSS(currentTime)}
+            </Text>
+            <Text style={{color: COLOR.WHITE}}>
+              {`/${secondsToHHMMSS(duration)}`}
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            style={styles.fullScreenView}
+            onPress={handleFullScreen}>
             <Image
               resizeMode="contain"
-              style={styles.pauseIcon}
-              source={localimages.pauseIcon}
+              style={styles.expandIcon}
+              source={localimages.fullscreen}
             />
-          ) : (
-            <Image
-              resizeMode="contain"
-              style={styles.playIcon}
-              source={localimages.playIcon}
-            />
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.playIcon} onPress={skipForward}>
-          <Image
-            resizeMode="contain"
-            style={styles.forwardIcon}
-            source={localimages.forward}
-          />
-        </TouchableOpacity>
-
-        <Slider
-          style={styles.sliderStyle}
-          value={currentTime}
-          tapToSeek
-          minimumValue={0}
-          maximumValue={duration}
-          minimumTrackTintColor={COLOR.lIGHTGREEN}
-          maximumTrackTintColor={COLOR.WHITE}
-          thumbTintColor={COLOR.lIGHTGREEN}
-          onSlidingComplete={value => {
-            value = Array.isArray(value) ? value[0] : value;
-            setCurrentTime(value);
-            videoRef.current.seek(value);
-          }}
-        />
-
-        <View style={styles.timerView}>
-          <Text style={{color: 'red'}}>{secondsToHHMMSS(currentTime)}</Text>
-          <Text style={{color: 'yellow'}}>{secondsToHHMMSS(duration)}</Text>
+          </TouchableOpacity>
         </View>
-
-        <TouchableOpacity style={styles.fullScreenView}>
-          <Image
-            resizeMode="contain"
-            style={styles.expandIcon}
-            source={localimages.fullscreen}
-          />
-        </TouchableOpacity>
-      </View>
-    </View>
+      )}
+    </TouchableOpacity>
   );
 };
 
 export default VideoPlayerComponent;
 
 const styles = StyleSheet.create({
-  container: {
-    // flex: 1,
-    // marginTop: 50,
-    // backgroundColor: 'red',
-    // backgroundColor: 'red',
-    // justifyContent: 'center',
-    // alignItems: 'center',
-    // borderWidth: 1,
-  },
   video: {
-    // // flex: 1,
-    // position: 'absolute',
-    // top: 0,
-    // left: 0,
-    // right: 0,
-    // bottom: 0,
     height: normalize(200),
     width: '100%',
-    // resizeMode: 'cover',
-    // borderWidth: 1,
   },
   playIcon: {
-    height: 30,
-    width: 35,
+    height: normalize(30),
+    width: normalize(35),
     tintColor: 'white',
   },
   pauseIcon: {
@@ -195,18 +238,16 @@ const styles = StyleSheet.create({
   },
   controllerView: {
     flexDirection: 'row',
-    alignItems: 'center',
+    marginTop: '12%',
     justifyContent: 'space-evenly',
-    // backgroundColor: 'red',
-    zIndex: 1,
-    height: normalize(200),
+    height: normalize(35),
     width: '100%',
-    position: 'absolute',
   },
   leftIcon: {
-    position: 'absolute',
-    top: normalize(10),
-    left: normalize(10),
+    width: normalize(30),
+    height: normalize(30),
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   backicon: {
     height: normalize(30),
@@ -216,28 +257,41 @@ const styles = StyleSheet.create({
   sliderStyle: {
     left: normalize(20),
     right: normalize(20),
-    position: 'absolute',
     width: '90%',
-    // borderWidth: 1,
-    bottom: normalize(20),
-    // alignItems: 'center',
+    marginTop: Platform.OS == 'ios' ? '8%' : '12%',
   },
   timerView: {
     flexDirection: 'row',
-    // justifyContent: 'space-between',
-    position: 'absolute',
-    bottom: normalize(10),
-    left: normalize(10),
-    // borderWidth: 1,
+    marginLeft: normalize(10),
   },
   fullScreenView: {
-    position: 'absolute',
-    bottom: normalize(10),
-    right: normalize(10),
+    width: normalize(25),
+    alignSelf: 'flex-end',
+    marginTop: 'auto',
+    height: normalize(25),
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   expandIcon: {
     height: normalize(20),
     width: normalize(20),
     tintColor: 'white',
+  },
+  fullScreenVideo: {
+    flex: 1,
+    height: height,
+    width: width,
+    backgroundColor: 'green',
+    borderWidth: 1,
+    zIndex: 1,
+  },
+  fullscreeennns: {
+    top: normalize(0),
+    height: '100%',
+    width: '100%',
+  },
+  controlTopView: {
+    position: 'absolute',
+    height: '100%',
   },
 });

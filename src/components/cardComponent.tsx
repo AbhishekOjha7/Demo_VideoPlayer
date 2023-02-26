@@ -16,6 +16,10 @@ interface customCardType {
   sources?: any;
 }
 
+/**
+ * CardComponet render card
+ */
+
 const CardComponent = (props: customCardType) => {
   const {thumb, title, subtitle} = props;
   return (
@@ -42,7 +46,7 @@ const CardComponent = (props: customCardType) => {
   );
 };
 
-export default CardComponent;
+export default React.memo(CardComponent);
 
 const styles = StyleSheet.create({
   cardImg: {

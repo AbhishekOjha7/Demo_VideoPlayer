@@ -4,12 +4,14 @@ import {
   Image,
   SafeAreaView,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  Platform,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import VideoPlayerComponent from '../../components/videoPlayerComponent';
 import {normalize} from '../../utils/dimensions';
 import {COLOR} from '../../utils/color';
@@ -18,16 +20,49 @@ import localimages from '../../utils/localimages';
 import fonts from '../../utils/fonts';
 import Share from 'react-native-share';
 import CardComponent from '../../components/cardComponent';
+import {NativeModules} from 'react-native';
+const {StatusBarManager} = NativeModules;
+
 import {STRINGS} from '../../utils/string';
+import Orientation from 'react-native-orientation-locker';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const VideoPlayer = ({route}: any) => {
   const {title, description, sources} = route.params;
   const [showVideo, unShowVideo] = useState(sources);
   const [mytitle, setTitle] = useState(title);
+  const [mydescription, setMydescription] = useState(description);
+  const [deviceOrientation, setdeviceOrientation] = useState('PORTRAIT');
 
-  console.log('====>', title, description, sources);
+  // Orientation.getDeviceOrientation(data => setdeviceOrientation(data));
+  // console.log('ispotraa', deviceOrientation);
   let data = videos.filter(item => item.sources[0] !== showVideo).splice(0, 5);
+
+  // const statusbarHandle = () => {
+  //   const platform = Platform.OS;
+  //   console.log(
+  //     platform === 'ios' && deviceOrientation === 'PORTRAIT',
+  //     '------',
+  //   );
+
+  //   if (platform === 'ios' && deviceOrientation === 'PORTRAIT') {
+  //     return StatusBarManager.HEIGHT;
+  //   } else {
+  //     return normalize(0);
+  //   }
+  // };
+
+  useEffect(() => {
+    Orientation.getOrientation(orientation => {
+      console.log(orientation.includes('LANDSCAPE'));
+      if (orientation.includes('LANDSCAPE')) {
+        Orientation.lockToPortrait();
+      }
+    });
+    Orientation.addLockListener(orientation =>
+      setdeviceOrientation(orientation),
+    );
+  }, []);
 
   const onRender = ({item}: any) => {
     console.log(item.sources[0]);
@@ -36,6 +71,7 @@ const VideoPlayer = ({route}: any) => {
         onPress={() => {
           unShowVideo(item.sources[0]);
           setTitle(item?.title);
+          setMydescription(item?.description);
         }}
         thumb={item?.thumb}
         title={item.title}
@@ -44,6 +80,10 @@ const VideoPlayer = ({route}: any) => {
       />
     );
   };
+  /**
+   * @myCustomShare share
+   *
+   */
   const myCustomShare = async () => {
     const shareOptions = {
       message: title,
@@ -65,7 +105,7 @@ const VideoPlayer = ({route}: any) => {
             {STRINGS.LABEL.views} {STRINGS.LABEL.unicode} {STRINGS.LABEL.days}
           </Text>
           <Text style={styles.descriptionTXt} numberOfLines={3}>
-            {description}
+            {mydescription}
           </Text>
           <View style={styles.iconsView}>
             {Icons.map((item, index) => (
@@ -119,8 +159,20 @@ const VideoPlayer = ({route}: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop:
+            Platform.OS === 'ios'
+              ? deviceOrientation.includes('PORTRAIT')
+                ? normalize(50)
+                : 0
+              : 0,
+        },
+      ]}>
       {/* <View style={styles.videoContainer}> */}
+      {/* <StatusBar  /> */}
       <VideoPlayerComponent videoUrl={showVideo} />
       {/* </View> */}
       <View>
@@ -132,7 +184,7 @@ const VideoPlayer = ({route}: any) => {
           ListHeaderComponent={_listHeaderComponent}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -249,7 +301,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: 0,
     flex: 1,
-    // justifyContent: 'space-evenly',
     alignItems: 'center',
     marginHorizontal: normalize(14),
   },

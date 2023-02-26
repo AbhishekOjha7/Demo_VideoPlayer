@@ -1,6 +1,5 @@
-import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import MyTabs from './src/router/TopTab';
+import {StyleSheet, Text, View} from 'react-native';
 import NavigationScreen from './src/router/NavigationContainer';
 
 const App = () => {
