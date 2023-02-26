@@ -25,14 +25,22 @@ const {StatusBarManager} = NativeModules;
 
 import {STRINGS} from '../../utils/string';
 import Orientation from 'react-native-orientation-locker';
+import {VideoShimmerContent} from '../../components/customShimmerEffetct';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const VideoPlayer = ({route}: any) => {
   const {title, description, sources} = route.params;
   const [showVideo, unShowVideo] = useState(sources);
   const [mytitle, setTitle] = useState(title);
+
   const [mydescription, setMydescription] = useState(description);
   const [deviceOrientation, setdeviceOrientation] = useState('PORTRAIT');
+  const [loading, setLoading] = React.useState(true);
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  }, []);
 
   // Orientation.getDeviceOrientation(data => setdeviceOrientation(data));
   // console.log('ispotraa', deviceOrientation);
@@ -65,19 +73,26 @@ const VideoPlayer = ({route}: any) => {
   }, []);
 
   const onRender = ({item}: any) => {
-    console.log(item.sources[0]);
+    // console.log('thumb', item?.thumb);
+
     return (
-      <CardComponent
-        onPress={() => {
-          unShowVideo(item.sources[0]);
-          setTitle(item?.title);
-          setMydescription(item?.description);
-        }}
-        thumb={item?.thumb}
-        title={item.title}
-        subtitle={item?.subtitle}
-        description={item?.description}
-      />
+      <>
+        {loading ? (
+          <VideoShimmerContent />
+        ) : (
+          <CardComponent
+            onPress={() => {
+              unShowVideo(item.sources[0]);
+              setTitle(item?.title);
+              setMydescription(item?.description);
+            }}
+            thumb={item?.thumb}
+            title={item.title}
+            subtitle={item?.subtitle}
+            description={item?.description}
+          />
+        )}
+      </>
     );
   };
   /**
@@ -197,7 +212,7 @@ const styles = StyleSheet.create({
   videoContainer: {
     width: windowWidth,
     height: normalize(200),
-    borderWidth: 1,
+    // borderWidth: 1,
     alignSelf: 'center',
   },
   listHeaderView: {
@@ -309,6 +324,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.EXTRABOLD,
     paddingHorizontal: normalize(20),
     paddingTop: normalize(16),
+    color: COLOR.BLACK,
   },
   subscribebuttonTxt: {
     color: COLOR.WHITE,

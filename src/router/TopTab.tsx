@@ -16,7 +16,7 @@ export default function MyTabs() {
         tabBarIndicatorStyle: {
           width: 0,
         },
-        tabBarPressColor: 'white',
+        tabBarPressColor: COLOR.WHITE,
         tabBarLabel: ({focused}) => {
           return (
             <View
@@ -31,8 +31,6 @@ export default function MyTabs() {
           );
         },
         swipeEnabled: false,
-        // tabBarIndicatorStyle: {backgroundColor: 'red'},
-        // tabBarLabelStyle: {color: '#fff'},
       })}>
       <Tab.Screen name={STRINGS.TOPTAB.Channels} component={ChannelScreens} />
       <Tab.Screen name={STRINGS.TOPTAB.Videos} component={VideosScreen} />
@@ -49,15 +47,15 @@ const styles = StyleSheet.create({
   },
   active: {
     fontSize: 14,
-    lineHeight: 20,
+    lineHeight: normalize(20),
     color: COLOR.WHITE,
     textAlign: 'center',
     fontFamily: 'Poppins-SemiBold',
   },
   inActive: {
     fontSize: 14,
-    lineHeight: 20,
-    color: 'black',
+    lineHeight: normalize(20),
+    color: COLOR.BLACK,
     fontFamily: 'Poppins-SemiBold',
   },
 });

@@ -6,7 +6,6 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  Touchable,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -17,10 +16,14 @@ import localimages from '../utils/localimages';
 import Slider from '@react-native-community/slider';
 import {COLOR} from '../utils/color';
 import Orientation from 'react-native-orientation-locker';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
+import secondsToHHMMSS from '../utils/getDuration';
+import {VideoShimmer, VideoShimmerContent} from './customShimmerEffetct';
+
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 const videoRef = React.createRef<any>();
+
 const VideoPlayerComponent = ({videoUrl}: any) => {
   const [play, setPlay] = useState(true);
   const [showControl, setShowControl] = useState(false);
@@ -29,17 +32,14 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
   const [fullscreen, setFullscreen] = useState(false);
   const [currOrientation, setOrientation] = useState('PORTRAIT');
   const navigation = useNavigation<any>();
+  const [loading, setLoading] = React.useState(true);
+  const isFocused = useIsFocused();
 
-  const secondsToHHMMSS = (seconds: number | string) => {
-    seconds = Number(seconds);
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = Math.floor((seconds % 3600) % 60);
-    const hrs = h > 0 ? (h < 10 ? `0${h}:` : `${h}:`) : '';
-    const mins = m > 0 ? (m < 10 ? `0${m}:` : `${m}:`) : '00:';
-    const scnds = s > 0 ? (s < 10 ? `0${s}` : s) : '00';
-    return `${hrs}${mins}${scnds}`;
-  };
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  }, []);
 
   useEffect(() => {
     Orientation.getOrientation(orientation => {
@@ -54,29 +54,29 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
     };
   }, []);
 
+  const getPlayState = () => {
+    return !play;
+  };
+
   const handleFullScreen = () => {
     setFullscreen(!fullscreen);
-    console.log('curreOtnsdf-->', currOrientation);
     if (currOrientation.includes('LANDSCAPE')) {
       Orientation.lockToPortrait();
     } else {
       Orientation.lockToLandscape();
     }
-    console.log('currrrr', currOrientation);
   };
 
   const handlePlay = () => {
-    console.log('hancdlll');
     setPlay(!play);
-    // if (play) {
-    //   setPlay(false);
-    //   setShowControl(true);
-    //   return;
-    // }
-    // setPlay(true);
-    // setTimeout(() => {
-    //   setShowControl(true);
-    // }, 3000);
+    handleIcons();
+    if (play === true) {
+      setShowControl(true);
+      setTimeout(() => {
+        setShowControl(false);
+      }, 1000);
+      return;
+    }
   };
   const skipBackward = () => {
     videoRef?.current?.seek(currentTime - 10);
@@ -101,36 +101,41 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
     setCurrentTime(obj.currentTime);
   };
   const handleIcons = () => {
-    console.log('++++++', showControl);
     setShowControl(true);
+  };
+
+  const goBack = () => {
+    setPlay(false);
     setTimeout(() => {
-      setShowControl(false);
-    }, 3000);
+      navigation.goBack();
+    }, 0);
   };
 
   const NavigateBack = () => {
-    navigation.goBack();
+    Orientation.lockToPortrait();
+    fullscreen ? setFullscreen(false) : goBack();
   };
 
   return (
     <TouchableOpacity onPress={handleIcons} activeOpacity={1}>
-      <Video
-        // rate={play ? 1.0 : 0.0}
-        ref={videoRef}
-        source={{uri: videoUrl}}
-        style={fullscreen ? styles.fullscreeennns : styles.video}
-        controls={false}
-        muted={true}
-        paused={!play}
-        onProgress={onProgress}
-        onLoad={onLoad}
-        resizeMode={'cover'}
-        onEnd={onEnd}
-        fullscreen={fullscreen}
-        fullscreenOrientation={'landscape'}
-      />
-
-      {showControl && (
+      {loading ? (
+        <VideoShimmer />
+      ) : (
+        <Video
+          ref={videoRef}
+          source={{uri: videoUrl}}
+          style={fullscreen ? styles.fullscreeennns : styles.video}
+          controls={false}
+          paused={isFocused === false ? true : getPlayState()}
+          onProgress={onProgress}
+          onLoad={onLoad}
+          resizeMode={'cover'}
+          onEnd={onEnd}
+          fullscreen={fullscreen}
+          fullscreenOrientation={'landscape'}
+        />
+      )}
+      {showControl ? (
         <View style={styles.controlTopView}>
           <TouchableOpacity style={styles.leftIcon} onPress={NavigateBack}>
             <Image style={styles.backicon} source={localimages.left_arrow} />
@@ -177,11 +182,10 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
             minimumTrackTintColor={COLOR.lIGHTGREEN}
             maximumTrackTintColor={COLOR.WHITE}
             thumbTintColor={COLOR.lIGHTGREEN}
-            // thumbImage={require('../assets/images/dot.png')}
             onSlidingComplete={value => {
               value = Array.isArray(value) ? value[0] : value;
               setCurrentTime(value);
-              videoRef.current.seek(value);
+              videoRef?.current?.seek(value);
             }}
           />
 
@@ -204,7 +208,7 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
             />
           </TouchableOpacity>
         </View>
-      )}
+      ) : null}
     </TouchableOpacity>
   );
 };
@@ -242,6 +246,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     height: normalize(35),
     width: '100%',
+    alignSelf: 'center',
+    bottom: -10,
   },
   leftIcon: {
     width: normalize(30),
@@ -252,12 +258,14 @@ const styles = StyleSheet.create({
   backicon: {
     height: normalize(30),
     width: normalize(30),
+    left: 10,
+    top: 10,
     tintColor: 'white',
   },
   sliderStyle: {
-    left: normalize(20),
-    right: normalize(20),
+    alignSelf: 'center',
     width: '90%',
+    bottom: 6,
     marginTop: Platform.OS == 'ios' ? '8%' : '12%',
   },
   timerView: {
@@ -267,10 +275,9 @@ const styles = StyleSheet.create({
   fullScreenView: {
     width: normalize(25),
     alignSelf: 'flex-end',
-    marginTop: 'auto',
+    bottom: 20,
+    right: 10,
     height: normalize(25),
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   expandIcon: {
     height: normalize(20),
@@ -281,7 +288,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: height,
     width: width,
-    backgroundColor: 'green',
+    // backgroundColor: 'green',
     borderWidth: 1,
     zIndex: 1,
   },

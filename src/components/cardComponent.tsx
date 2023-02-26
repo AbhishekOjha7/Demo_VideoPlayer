@@ -8,12 +8,13 @@ import fonts from '../utils/fonts';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {STRINGS} from '../utils/string';
 interface customCardType {
-  thumb: any;
-  title: any;
+  thumb: string;
+  title: string;
   subtitle?: string;
-  description?: any;
+  description?: string;
   onPress?: any;
-  sources?: any;
+  sources?: string;
+  duration?: string;
 }
 
 /**
@@ -31,6 +32,23 @@ const CardComponent = (props: customCardType) => {
           source={{uri: thumb}}
         />
         <Image source={localimages.playIcon} style={styles.pauseIcon} />
+        <View
+          style={{
+            position: 'absolute',
+            backgroundColor: '#5C3817',
+            // backgroundColor: 'black',
+            justifyContent: 'center',
+            padding: 6,
+            width: 60,
+            height: 30,
+            right: 10,
+            bottom: 10,
+            alignItems: 'center',
+            opacity: 0.6,
+            borderRadius: 8,
+          }}>
+          <Text style={{color: COLOR.WHITE, opacity: 1}}>{'5:30'}</Text>
+        </View>
       </View>
       <View style={styles.headerView}>
         <Text style={styles.titleTxt}>{title}</Text>

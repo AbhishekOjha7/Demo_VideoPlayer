@@ -1,5 +1,4 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
 import NavigationScreen from './src/router/NavigationContainer';
 
 const App = () => {
@@ -7,5 +6,3 @@ const App = () => {
 };
 
 export default App;
-
-const styles = StyleSheet.create({});

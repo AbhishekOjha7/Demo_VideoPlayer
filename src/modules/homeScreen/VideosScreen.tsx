@@ -16,6 +16,7 @@ import {useNavigation} from '@react-navigation/native';
 import {videos} from '../../utils/dummyData';
 import CardComponent from '../../components/cardComponent';
 import {STRINGS} from '../../utils/string';
+import {VideoShimmerContent} from '../../components/customShimmerEffetct';
 
 const VideosScreen = () => {
   const [data, setData] = React.useState(videos.slice(0, 3));
@@ -24,6 +25,13 @@ const VideosScreen = () => {
   /**
    * @addData for implement pagination
    */
+
+  const [loading, setLoading] = React.useState(true);
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  }, []);
 
   const addData = () => {
     if (videos.length != data.length) {
@@ -44,19 +52,25 @@ const VideosScreen = () => {
 
   const _renderItem = ({item}: any) => {
     return (
-      <CardComponent
-        onPress={() => {
-          navigation.navigate('VideoPlayer', {
-            title: item?.title,
-            description: item?.description,
-            sources: item?.sources[0],
-          });
-        }}
-        thumb={item.thumb}
-        title={item.title}
-        subtitle={item?.subtitle}
-        description={item?.description}
-      />
+      <>
+        {loading ? (
+          <VideoShimmerContent />
+        ) : (
+          <CardComponent
+            onPress={() => {
+              navigation.navigate('VideoPlayer', {
+                title: item?.title,
+                description: item?.description,
+                sources: item?.sources[0],
+              });
+            }}
+            thumb={item?.thumb}
+            title={item?.title}
+            subtitle={item?.subtitle}
+            description={item?.description}
+          />
+        )}
+      </>
     );
   };
 
