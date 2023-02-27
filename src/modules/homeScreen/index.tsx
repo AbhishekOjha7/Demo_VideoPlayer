@@ -1,8 +1,8 @@
-import {SafeAreaView, StyleSheet, View} from 'react-native';
 import React from 'react';
-import MyTabs from '../../router/TopTab';
-import HeaderComponents from '../../components/headerComponents';
 import {COLOR} from '../../utils/color';
+import MyTabs from '../../router/TopTab';
+import {SafeAreaView, StyleSheet, View} from 'react-native';
+import HeaderComponents from '../../components/headerComponents';
 
 const HomeScreen = () => {
   return (

@@ -1,21 +1,9 @@
-import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  ImageBackground,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
 import React, {useEffect} from 'react';
-import {normalize} from '../../utils/dimensions';
-import {COLOR} from '../../utils/color';
-import {useNavigation} from '@react-navigation/native';
 import {videos} from '../../utils/dummyData';
+import {normalize} from '../../utils/dimensions';
+import {useNavigation} from '@react-navigation/native';
 import CardComponent from '../../components/cardComponent';
-import {STRINGS} from '../../utils/string';
+import {ActivityIndicator, FlatList, StyleSheet} from 'react-native';
 import {VideoShimmerContent} from '../../components/customShimmerEffetct';
 
 const VideosScreen = () => {
@@ -28,11 +16,9 @@ const VideosScreen = () => {
       setLoading(false);
     }, 1000);
   }, []);
-
   /**
    * @addData for implement pagination
    */
-
   const addData = () => {
     if (videos.length != data.length) {
       [...data, ...videos.slice(data.length - 1, data.length + 2)];
@@ -43,16 +29,14 @@ const VideosScreen = () => {
       }, 1000);
     }
   };
-
   /**
    *
    * @param _renderItem for flatlist render the CardComponent
    * @returns
    */
-
   const _renderItem = ({item}: any) => {
     return (
-      <>
+      <React.Fragment>
         {loading ? (
           <VideoShimmerContent />
         ) : (
@@ -70,14 +54,12 @@ const VideosScreen = () => {
             description={item?.description}
           />
         )}
-      </>
+      </React.Fragment>
     );
   };
-
   const _listFooterComponent = () => {
     return videos.length != data.length ? <ActivityIndicator /> : null;
   };
-
   return (
     <FlatList
       bounces={false}

@@ -13,10 +13,10 @@ import fonts from '../../utils/fonts';
 import Share from 'react-native-share';
 import {COLOR} from '../../utils/color';
 import {STRINGS} from '../../utils/string';
+import React, {useEffect, useState} from 'react';
+import localimages from '../../utils/localimages';
 import {normalize} from '../../utils/dimensions';
 import {Icons, videos} from '../../utils/dummyData';
-import localimages from '../../utils/localimages';
-import React, {useEffect, useState} from 'react';
 import Orientation from 'react-native-orientation-locker';
 import CardComponent from '../../components/cardComponent';
 import VideoPlayerComponent from '../../components/videoPlayerComponent';
@@ -40,7 +40,7 @@ const VideoPlayer = ({route}: any) => {
       setLoading(false);
     }, 1000);
   }, []);
-  let data = videos.filter(item => item.sources[0] !== showVideo).splice(0, 5);
+  let data = videos.filter(item => item.sources[0] !== showVideo).splice(0, 5); //remove 5 card at 0 postion
   useEffect(() => {
     Orientation.getOrientation(orientation => {
       if (orientation.includes('LANDSCAPE')) {
@@ -51,6 +51,7 @@ const VideoPlayer = ({route}: any) => {
       setdeviceOrientation(orientation),
     );
   }, []);
+
   useEffect(() => {
     listRef?.current?.scrollToOffset({animated: true, y: 0});
   }, [data]);
@@ -97,6 +98,11 @@ const VideoPlayer = ({route}: any) => {
       console.log('errror', error);
     }
   };
+
+  /**
+   *
+   * @returns @_listHeaderComponent is used for header of the videoPlayerScreen
+   */
 
   const _listHeaderComponent = () => {
     return (
@@ -162,7 +168,6 @@ const VideoPlayer = ({route}: any) => {
       </>
     );
   };
-
   const checkStatusBar = () => {
     if (Platform.OS === 'ios') {
       if (deviceOrientation.includes('PORTRAIT')) {
@@ -171,7 +176,6 @@ const VideoPlayer = ({route}: any) => {
     }
     return 0;
   };
-
   return (
     <View
       style={[

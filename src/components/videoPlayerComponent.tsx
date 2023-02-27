@@ -15,11 +15,9 @@ import localimages from '../utils/localimages';
 import secondsToHHMMSS from '../utils/getDuration';
 import {VideoShimmer} from './customShimmerEffetct';
 import Slider from '@react-native-community/slider';
-import React, {useCallback, useEffect, useRef, useState} from 'react';
 import Orientation from 'react-native-orientation-locker';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
-const height = Dimensions.get('window').height;
-const width = Dimensions.get('window').width;
 const videoRef = React.createRef<any>();
 const VideoPlayerComponent = ({videoUrl}: any) => {
   const isFocused = useIsFocused();
@@ -197,7 +195,6 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
           <TouchableOpacity style={styles.leftIcon} onPress={NavigateBack}>
             <Image style={styles.backicon} source={localimages.left_arrow} />
           </TouchableOpacity>
-
           <View style={styles.controllerView}>
             <TouchableOpacity onPress={skipBackward}>
               <Image
@@ -265,7 +262,7 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
   );
 };
 
-export default VideoPlayerComponent;
+export default React.memo(VideoPlayerComponent);
 
 const styles = StyleSheet.create({
   video: {
@@ -302,7 +299,7 @@ const styles = StyleSheet.create({
   leftIcon: {
     width: normalize(30),
     height: normalize(30),
-    left: 10,
+    left: normalize(10),
   },
   backicon: {
     height: normalize(30),

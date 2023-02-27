@@ -32,7 +32,7 @@ const HeaderComponents = (props: headerProps) => {
   );
 };
 
-export default React.memo(HeaderComponents);
+export default HeaderComponents;
 
 const styles = StyleSheet.create({
   headerMainView: {

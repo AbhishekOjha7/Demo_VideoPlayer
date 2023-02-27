@@ -134,7 +134,6 @@ const styles = StyleSheet.create({
   },
   lengthText: {
     color: COLOR.WHITE,
-    // opacity: 1,
     fontFamily: fonts.MEDIUM,
   },
 });

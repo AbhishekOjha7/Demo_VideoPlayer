@@ -1,12 +1,11 @@
-import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {NavigationContainer} from '@react-navigation/native';
-import ArticlesScreen from '../modules/homeScreen/ArticlesScreen';
-import ChannelScreens from '../modules/homeScreen/ChannelScreens';
-import VideosScreen from '../modules/homeScreen/VideosScreen';
-import {View, Text, StyleSheet} from 'react-native';
-import {normalize} from '../utils/dimensions';
 import {COLOR} from '../utils/color';
 import {STRINGS} from '../utils/string';
+import {normalize} from '../utils/dimensions';
+import {View, Text, StyleSheet} from 'react-native';
+import VideosScreen from '../modules/homeScreen/VideosScreen';
+import ArticlesScreen from '../modules/homeScreen/ArticlesScreen';
+import ChannelScreens from '../modules/homeScreen/ChannelScreens';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 const Tab = createMaterialTopTabNavigator();
 export default function MyTabs() {
   return (
