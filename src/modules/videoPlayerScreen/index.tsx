@@ -28,10 +28,8 @@ const {StatusBarManager} = NativeModules;
 const VideoPlayer = ({route}: any) => {
   const listRef = React.useRef<any>();
   const {title, description, sources} = route.params;
-  // const [mytitle, setTitle] = useState(title);
   const [loading, setLoading] = React.useState(true);
   const [showVideo, unShowVideo] = useState(sources);
-  // const [mydescription, setMydescription] = useState(description);
   const [deviceOrientation, setdeviceOrientation] = useState('PORTRAIT');
   const [titleDescription, settitleDescription] = useState({
     mytitle: title,
@@ -42,7 +40,6 @@ const VideoPlayer = ({route}: any) => {
       setLoading(false);
     }, 1000);
   }, []);
-
   let data = videos.filter(item => item.sources[0] !== showVideo).splice(0, 5);
   useEffect(() => {
     Orientation.getOrientation(orientation => {
@@ -54,39 +51,35 @@ const VideoPlayer = ({route}: any) => {
       setdeviceOrientation(orientation),
     );
   }, []);
-
   useEffect(() => {
     listRef?.current?.scrollToOffset({animated: true, y: 0});
   }, [data]);
 
   const onRender = ({item}: any) => {
     return (
-      <>
+      <React.Fragment>
         {loading ? (
           <VideoShimmerContent />
         ) : (
           <CardComponent
             onPress={() => {
               unShowVideo(item.sources[0]);
-              // setTitle(item?.title);
-
               settitleDescription(prev => ({
                 ...prev,
                 mytitle: item.title,
               }));
-              // setMydescription(item?.description);
               settitleDescription(prev => ({
                 ...prev,
                 mydescription: item.description,
               }));
             }}
             thumb={item?.thumb}
-            title={item.title}
+            title={item?.title}
             subtitle={item?.subtitle}
             description={item?.description}
           />
         )}
-      </>
+      </React.Fragment>
     );
   };
   /**
@@ -122,7 +115,11 @@ const VideoPlayer = ({route}: any) => {
                 onPress={index === 2 ? myCustomShare : () => {}}
                 key={index.toString()}
                 style={styles.iconsTouchable}>
-                <Image source={item.img} />
+                <Image
+                  style={styles.mapIcon}
+                  resizeMode="contain"
+                  source={item.img}
+                />
                 <Text style={styles.iconsTitle}>{item?.title}</Text>
               </TouchableOpacity>
             ))}
@@ -345,5 +342,9 @@ const styles = StyleSheet.create({
   },
   contentContainerStyle: {
     paddingBottom: normalize(10),
+  },
+  mapIcon: {
+    height: normalize(25),
+    width: normalize(25),
   },
 });

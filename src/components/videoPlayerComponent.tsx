@@ -166,22 +166,13 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
     }
   };
   const _onBuffer = ({isBuffering}: any) => {
-    console.log('on buffer', isBuffering);
     setBuffer(isBuffering);
   };
   return (
     <TouchableOpacity onPress={handleIcons} activeOpacity={1}>
       {loading && <VideoShimmer />}
       {buffer && (
-        <View
-          style={{
-            height: 200,
-            justifyContent: 'center',
-            alignItems: 'center',
-            alignSelf: 'center',
-            position: 'absolute',
-            zIndex: 1,
-          }}>
+        <View style={styles.bufferStyle}>
           <ActivityIndicator size={40} />
         </View>
       )}
@@ -238,40 +229,36 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
               />
             </TouchableOpacity>
           </View>
-
-          <Slider
-            style={styles.sliderStyle}
-            value={currentTime}
-            tapToSeek
-            minimumValue={0}
-            maximumValue={duration}
-            minimumTrackTintColor={COLOR.lIGHTGREEN}
-            maximumTrackTintColor={COLOR.WHITE}
-            thumbTintColor={COLOR.lIGHTGREEN}
-            onSlidingStart={() => {
-              clerTimeOut();
-            }}
-            onSlidingComplete={_onSlidingComplete}
-          />
-
-          <View style={styles.timerView}>
-            <Text style={{color: COLOR.WHITE}}>
-              {secondsToHHMMSS(currentTime)}
-            </Text>
-            <Text style={{color: COLOR.WHITE}}>
-              {`/${secondsToHHMMSS(duration)}`}
-            </Text>
-          </View>
-
-          <TouchableOpacity
-            style={styles.fullScreenView}
-            onPress={handleFullScreen}>
-            <Image
-              resizeMode="contain"
-              style={styles.expandIcon}
-              source={localimages.fullscreen}
+          <View>
+            <Slider
+              style={styles.sliderStyle}
+              value={currentTime}
+              tapToSeek
+              minimumValue={0}
+              maximumValue={duration}
+              minimumTrackTintColor={COLOR.lIGHTGREEN}
+              maximumTrackTintColor={COLOR.WHITE}
+              thumbTintColor={COLOR.lIGHTGREEN}
+              onSlidingStart={() => {
+                clerTimeOut();
+              }}
+              onSlidingComplete={_onSlidingComplete}
             />
-          </TouchableOpacity>
+            <View>
+              <Text style={{color: COLOR.WHITE}}>
+                {secondsToHHMMSS(currentTime)} {`/${secondsToHHMMSS(duration)}`}
+              </Text>
+              <TouchableOpacity
+                style={styles.fullScreenView}
+                onPress={handleFullScreen}>
+                <Image
+                  resizeMode="contain"
+                  style={styles.expandIcon}
+                  source={localimages.fullscreen}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       ) : null}
     </TouchableOpacity>
@@ -307,18 +294,15 @@ const styles = StyleSheet.create({
   },
   controllerView: {
     flexDirection: 'row',
-    marginTop: '12%',
     justifyContent: 'space-evenly',
-    height: normalize(35),
     width: '100%',
     alignSelf: 'center',
-    bottom: normalize(-10),
+    paddingHorizontal: normalize(20),
   },
   leftIcon: {
     width: normalize(30),
     height: normalize(30),
-    justifyContent: 'center',
-    alignItems: 'center',
+    left: 10,
   },
   backicon: {
     height: normalize(30),
@@ -330,31 +314,17 @@ const styles = StyleSheet.create({
   sliderStyle: {
     alignSelf: 'center',
     width: '90%',
-    bottom: normalize(6),
-    marginTop: Platform.OS == 'ios' ? '8%' : '12%',
-  },
-  timerView: {
-    flexDirection: 'row',
-    marginLeft: normalize(10),
   },
   fullScreenView: {
     width: normalize(25),
     alignSelf: 'flex-end',
     bottom: normalize(20),
-    right: normalize(10),
-    height: normalize(25),
+    right: normalize(20),
   },
   expandIcon: {
     height: normalize(20),
     width: normalize(20),
     tintColor: 'white',
-  },
-  fullScreenVideo: {
-    flex: 1,
-    height: height,
-    width: width,
-    borderWidth: 1,
-    zIndex: 1,
   },
   fullscreeennns: {
     top: normalize(0),
@@ -362,7 +332,20 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   controlTopView: {
-    position: 'absolute',
     height: '100%',
+    width: '100%',
+    position: 'absolute',
+    justifyContent: 'space-between',
+    paddingHorizontal: normalize(6),
+    paddingBottom: normalize(6),
+    paddingTop: normalize(8),
+  },
+  bufferStyle: {
+    height: normalize(200),
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    position: 'absolute',
+    zIndex: 1,
   },
 });
