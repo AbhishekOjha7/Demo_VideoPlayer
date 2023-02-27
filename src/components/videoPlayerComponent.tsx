@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Dimensions,
   Image,
   Platform,
@@ -14,7 +15,7 @@ import localimages from '../utils/localimages';
 import secondsToHHMMSS from '../utils/getDuration';
 import {VideoShimmer} from './customShimmerEffetct';
 import Slider from '@react-native-community/slider';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import Orientation from 'react-native-orientation-locker';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 const height = Dimensions.get('window').height;
@@ -29,13 +30,14 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [loading, setLoading] = React.useState(true);
   const [showControl, setShowControl] = useState(false);
+  const [buffer, setBuffer] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [currOrientation, setOrientation] = useState('PORTRAIT');
 
   useEffect(() => {
     setTimeout(() => {
       setLoading(false);
-    }, 1000);
+    }, 500);
   }, []);
 
   useEffect(() => {
@@ -46,6 +48,7 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
     });
     Orientation.addLockListener(orientation => setOrientation(orientation));
     return () => {
+      Orientation.unlockAllOrientations();
       Orientation.removeLockListener(handleFullScreen);
     };
   }, []);
@@ -99,7 +102,6 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
   const skipForward = () => {
     clerTimeOut();
     videoRef?.current?.seek(currentTime + 10);
-    setCurrentTime(currentTime + 10);
     const timeout5 = setTimeout(() => {
       setShowControl(false);
     }, 3000);
@@ -115,13 +117,14 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
     setCurrentTime(0);
   };
 
-  const onProgress = (data: any) => {
+  const onProgress = useCallback((data: any) => {
     setCurrentTime(data.currentTime);
-  };
-  const onLoad = (obj: any) => {
+  }, []);
+
+  const onLoad = useCallback((obj: any) => {
     setDuration(obj.duration);
     setCurrentTime(obj.currentTime);
-  };
+  }, []);
   /**
    * @handleIcons is used for show controls the videoPlayer screen when touch the screen
    */
@@ -162,26 +165,42 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
       timeoutRef.current.push(timeout3);
     }
   };
-
+  const _onBuffer = ({isBuffering}: any) => {
+    console.log('on buffer', isBuffering);
+    setBuffer(isBuffering);
+  };
   return (
     <TouchableOpacity onPress={handleIcons} activeOpacity={1}>
-      {loading ? (
-        <VideoShimmer />
-      ) : (
-        <Video
-          ref={videoRef}
-          source={{uri: videoUrl}}
-          style={fullscreen ? styles.fullscreeennns : styles.video}
-          controls={false}
-          paused={isFocused === false ? true : getPlayState()}
-          onProgress={onProgress}
-          onLoad={onLoad}
-          resizeMode={'cover'}
-          onEnd={onEnd}
-          fullscreen={fullscreen}
-          fullscreenOrientation={'landscape'}
-        />
+      {loading && <VideoShimmer />}
+      {buffer && (
+        <View
+          style={{
+            height: 200,
+            justifyContent: 'center',
+            alignItems: 'center',
+            alignSelf: 'center',
+            position: 'absolute',
+            zIndex: 1,
+          }}>
+          <ActivityIndicator size={40} />
+        </View>
       )}
+      <Video
+        ref={videoRef}
+        source={{uri: videoUrl}}
+        style={fullscreen ? styles.fullscreeennns : styles.video}
+        controls={false}
+        paused={isFocused === false ? true : getPlayState()}
+        onProgress={onProgress}
+        onLoad={onLoad}
+        resizeMode={'cover'}
+        onEnd={onEnd}
+        fullscreen={fullscreen}
+        fullscreenOrientation={'landscape'}
+        onBuffer={_onBuffer}
+        playInBackground={false}
+        playWhenInactive={false}
+      />
       {showControl ? (
         <View style={styles.controlTopView}>
           <TouchableOpacity style={styles.leftIcon} onPress={NavigateBack}>
@@ -269,22 +288,22 @@ const styles = StyleSheet.create({
   playIcon: {
     height: normalize(30),
     width: normalize(35),
-    tintColor: 'white',
+    tintColor: COLOR.WHITE,
   },
   pauseIcon: {
     height: normalize(30),
     width: normalize(35),
-    tintColor: 'white',
+    tintColor: COLOR.WHITE,
   },
   backWardIcon: {
     height: normalize(35),
     width: normalize(35),
-    tintColor: 'white',
+    tintColor: COLOR.WHITE,
   },
   forwardIcon: {
     height: normalize(35),
     width: normalize(35),
-    tintColor: 'white',
+    tintColor: COLOR.WHITE,
   },
   controllerView: {
     flexDirection: 'row',

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
   Platform,
+  NativeModules,
 } from 'react-native';
 import fonts from '../../utils/fonts';
 import Share from 'react-native-share';
@@ -22,18 +23,26 @@ import VideoPlayerComponent from '../../components/videoPlayerComponent';
 import {VideoShimmerContent} from '../../components/customShimmerEffetct';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
+const {StatusBarManager} = NativeModules;
+
 const VideoPlayer = ({route}: any) => {
+  const listRef = React.useRef<any>();
   const {title, description, sources} = route.params;
-  const [mytitle, setTitle] = useState(title);
+  // const [mytitle, setTitle] = useState(title);
   const [loading, setLoading] = React.useState(true);
   const [showVideo, unShowVideo] = useState(sources);
-  const [mydescription, setMydescription] = useState(description);
+  // const [mydescription, setMydescription] = useState(description);
   const [deviceOrientation, setdeviceOrientation] = useState('PORTRAIT');
+  const [titleDescription, settitleDescription] = useState({
+    mytitle: title,
+    mydescription: description,
+  });
   useEffect(() => {
     setTimeout(() => {
       setLoading(false);
     }, 1000);
   }, []);
+
   let data = videos.filter(item => item.sources[0] !== showVideo).splice(0, 5);
   useEffect(() => {
     Orientation.getOrientation(orientation => {
@@ -46,6 +55,10 @@ const VideoPlayer = ({route}: any) => {
     );
   }, []);
 
+  useEffect(() => {
+    listRef?.current?.scrollToOffset({animated: true, y: 0});
+  }, [data]);
+
   const onRender = ({item}: any) => {
     return (
       <>
@@ -55,8 +68,17 @@ const VideoPlayer = ({route}: any) => {
           <CardComponent
             onPress={() => {
               unShowVideo(item.sources[0]);
-              setTitle(item?.title);
-              setMydescription(item?.description);
+              // setTitle(item?.title);
+
+              settitleDescription(prev => ({
+                ...prev,
+                mytitle: item.title,
+              }));
+              // setMydescription(item?.description);
+              settitleDescription(prev => ({
+                ...prev,
+                mydescription: item.description,
+              }));
             }}
             thumb={item?.thumb}
             title={item.title}
@@ -87,12 +109,12 @@ const VideoPlayer = ({route}: any) => {
     return (
       <>
         <View style={styles.listHeaderView}>
-          <Text style={styles.titleTxt}>{mytitle}</Text>
+          <Text style={styles.titleTxt}>{titleDescription.mytitle}</Text>
           <Text style={styles.viewsTxt}>
             {STRINGS.LABEL.views} {STRINGS.LABEL.unicode} {STRINGS.LABEL.days}
           </Text>
           <Text style={styles.descriptionTXt} numberOfLines={3}>
-            {mydescription}
+            {titleDescription.mydescription}
           </Text>
           <View style={styles.iconsView}>
             {Icons.map((item, index) => (
@@ -147,7 +169,7 @@ const VideoPlayer = ({route}: any) => {
   const checkStatusBar = () => {
     if (Platform.OS === 'ios') {
       if (deviceOrientation.includes('PORTRAIT')) {
-        return normalize(45);
+        return StatusBarManager.HEIGHT;
       }
     }
     return 0;
@@ -164,6 +186,7 @@ const VideoPlayer = ({route}: any) => {
       <VideoPlayerComponent videoUrl={showVideo} />
       <View>
         <FlatList
+          ref={listRef}
           data={data}
           style={styles.FlatListStyle}
           contentContainerStyle={styles.contentContainerStyle}

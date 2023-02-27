@@ -81,6 +81,10 @@ const styles = StyleSheet.create({
   cardShimmerView: {
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'absolute',
+    width: '100%',
+    elevation: 5,
+    zIndex: 5,
   },
   cardShimmerPlaceholder: {
     width: '100%',
