@@ -1,122 +1,132 @@
-import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
-import LinearGradient from 'react-native-linear-gradient';
 import React from 'react';
-import {ActivityIndicator, Animated, Dimensions, View} from 'react-native';
-import {normalize} from '../utils/dimensions';
 import {COLOR} from '../utils/color';
+import {normalize} from '../utils/dimensions';
+import LinearGradient from 'react-native-linear-gradient';
+import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
+import {
+  ActivityIndicator,
+  Animated,
+  Dimensions,
+  StyleSheet,
+  View,
+} from 'react-native';
 const windowWidth = Dimensions.get('screen').width;
-const windowHeight = Dimensions.get('screen').height;
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 const VideoShimmer = () => {
   const firstLineRef = React.createRef<any>();
   React.useEffect(() => {
-    const facebookAnimated = Animated.stagger(400, [
+    const videoAnimated = Animated.stagger(400, [
       Animated.parallel([firstLineRef.current.getAnimated()]),
     ]);
-    Animated.loop(facebookAnimated).start();
+    Animated.loop(videoAnimated).start();
   }, []);
 
   return (
-    <View
-      style={{
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
+    <View style={styles.cardShimmerView}>
       <ShimmerPlaceholder
-        style={{
-          width: '100%',
-          height: normalize(200),
-        }}
+        style={styles.cardShimmerPlaceholder}
         ref={firstLineRef}
         stopAutoRun
       />
-      <ActivityIndicator
-        size={40}
-        style={{
-          alignSelf: 'center',
-          position: 'absolute',
-        }}
-      />
+      <ActivityIndicator size={40} style={styles.indicatorStyle} />
     </View>
   );
 };
 
 const VideoShimmerContent = () => {
-  // Handle animation
   const firstLineRef = React.createRef<any>();
   const secondLineRef = React.createRef<any>();
-
   React.useEffect(() => {
-    const facebookAnimated = Animated.stagger(400, [
+    const videoAnimated = Animated.stagger(400, [
       Animated.parallel([
         firstLineRef.current.getAnimated(),
         secondLineRef.current.getAnimated(),
       ]),
     ]);
-    Animated.loop(facebookAnimated).start();
+    Animated.loop(videoAnimated).start();
   }, []);
 
   return (
-    <View
-      style={{
-        width: windowWidth - 40,
-        backgroundColor: COLOR.TEXTGREY,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: normalize(10),
-        paddingBottom: normalize(10),
-        // marginBottom: normalize(20),r
-        alignSelf: 'center',
-        marginTop: normalize(20),
-      }}>
+    <View style={styles.shimmerContentView}>
       <ShimmerPlaceholder
-        style={{
-          width: windowWidth - 40,
-          height: 180,
-          marginHorizontal: normalize(20),
-          //   borderRadius: normalize(10),
-        }}
+        style={styles.innerCardShimmerStyle}
         ref={firstLineRef}
         stopAutoRun
       />
       <ShimmerPlaceholder
-        style={{
-          width: windowWidth - 80,
-          height: 20,
-          marginHorizontal: normalize(20),
-          marginTop: normalize(20),
-          borderRadius: normalize(10),
-        }}
+        style={styles.secondinnerCardShimmerStyle}
         ref={secondLineRef}
         stopAutoRun
       />
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <View style={styles.userShimmerView}>
         <ShimmerPlaceholder
-          style={{
-            width: 40,
-            height: 40,
-            marginRight: normalize(20),
-            marginTop: normalize(20),
-            borderRadius: normalize(50),
-          }}
+          style={styles.userShimmerImage}
           ref={secondLineRef}
           stopAutoRun
         />
         <ShimmerPlaceholder
-          style={{
-            width: windowWidth - 140,
-            height: 20,
-            marginTop: normalize(20),
-            borderRadius: normalize(10),
-          }}
+          style={styles.userShimmerName}
           ref={secondLineRef}
           stopAutoRun
         />
       </View>
-      {/* <ShimmerPlaceholder ref={thirdLineRef} stopAutoRun /> */}
     </View>
   );
 };
 
 export {VideoShimmer, VideoShimmerContent};
+
+const styles = StyleSheet.create({
+  cardShimmerView: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cardShimmerPlaceholder: {
+    width: '100%',
+    height: normalize(200),
+  },
+  indicatorStyle: {
+    alignSelf: 'center',
+    position: 'absolute',
+  },
+  shimmerContentView: {
+    width: windowWidth - 40,
+    backgroundColor: COLOR.TEXTGREY,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: normalize(10),
+    paddingBottom: normalize(10),
+    alignSelf: 'center',
+    marginTop: normalize(20),
+  },
+  innerCardShimmerStyle: {
+    width: windowWidth - 40,
+    height: normalize(180),
+    marginHorizontal: normalize(20),
+  },
+  secondinnerCardShimmerStyle: {
+    width: windowWidth - 80,
+    height: normalize(20),
+    marginHorizontal: normalize(20),
+    marginTop: normalize(20),
+    borderRadius: normalize(10),
+  },
+  userShimmerView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  userShimmerImage: {
+    width: normalize(40),
+    height: normalize(40),
+    marginRight: normalize(20),
+    marginTop: normalize(20),
+    borderRadius: normalize(50),
+  },
+  userShimmerName: {
+    width: windowWidth - 140,
+    height: normalize(20),
+    marginTop: normalize(20),
+    borderRadius: normalize(10),
+  },
+});

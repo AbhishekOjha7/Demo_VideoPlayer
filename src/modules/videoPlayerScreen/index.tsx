@@ -2,67 +2,41 @@ import {
   Dimensions,
   FlatList,
   Image,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
   Platform,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
-import VideoPlayerComponent from '../../components/videoPlayerComponent';
-import {normalize} from '../../utils/dimensions';
-import {COLOR} from '../../utils/color';
-import {Icons, videos} from '../../utils/dummyData';
-import localimages from '../../utils/localimages';
 import fonts from '../../utils/fonts';
 import Share from 'react-native-share';
-import CardComponent from '../../components/cardComponent';
-import {NativeModules} from 'react-native';
-const {StatusBarManager} = NativeModules;
-
+import {COLOR} from '../../utils/color';
 import {STRINGS} from '../../utils/string';
+import {normalize} from '../../utils/dimensions';
+import {Icons, videos} from '../../utils/dummyData';
+import localimages from '../../utils/localimages';
+import React, {useEffect, useState} from 'react';
 import Orientation from 'react-native-orientation-locker';
+import CardComponent from '../../components/cardComponent';
+import VideoPlayerComponent from '../../components/videoPlayerComponent';
 import {VideoShimmerContent} from '../../components/customShimmerEffetct';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const VideoPlayer = ({route}: any) => {
   const {title, description, sources} = route.params;
-  const [showVideo, unShowVideo] = useState(sources);
   const [mytitle, setTitle] = useState(title);
-
+  const [loading, setLoading] = React.useState(true);
+  const [showVideo, unShowVideo] = useState(sources);
   const [mydescription, setMydescription] = useState(description);
   const [deviceOrientation, setdeviceOrientation] = useState('PORTRAIT');
-  const [loading, setLoading] = React.useState(true);
   useEffect(() => {
     setTimeout(() => {
       setLoading(false);
     }, 1000);
   }, []);
-
-  // Orientation.getDeviceOrientation(data => setdeviceOrientation(data));
-  // console.log('ispotraa', deviceOrientation);
   let data = videos.filter(item => item.sources[0] !== showVideo).splice(0, 5);
-
-  // const statusbarHandle = () => {
-  //   const platform = Platform.OS;
-  //   console.log(
-  //     platform === 'ios' && deviceOrientation === 'PORTRAIT',
-  //     '------',
-  //   );
-
-  //   if (platform === 'ios' && deviceOrientation === 'PORTRAIT') {
-  //     return StatusBarManager.HEIGHT;
-  //   } else {
-  //     return normalize(0);
-  //   }
-  // };
-
   useEffect(() => {
     Orientation.getOrientation(orientation => {
-      console.log(orientation.includes('LANDSCAPE'));
       if (orientation.includes('LANDSCAPE')) {
         Orientation.lockToPortrait();
       }
@@ -73,8 +47,6 @@ const VideoPlayer = ({route}: any) => {
   }, []);
 
   const onRender = ({item}: any) => {
-    // console.log('thumb', item?.thumb);
-
     return (
       <>
         {loading ? (
@@ -134,7 +106,6 @@ const VideoPlayer = ({route}: any) => {
             ))}
           </View>
         </View>
-
         <View style={styles.subscriberView}>
           <Image style={styles.subscriberIcon} source={localimages.girlIcon} />
           <View style={styles.subscriberHead}>
@@ -173,23 +144,24 @@ const VideoPlayer = ({route}: any) => {
     );
   };
 
+  const checkStatusBar = () => {
+    if (Platform.OS === 'ios') {
+      if (deviceOrientation.includes('PORTRAIT')) {
+        return normalize(45);
+      }
+    }
+    return 0;
+  };
+
   return (
     <View
       style={[
         styles.container,
         {
-          paddingTop:
-            Platform.OS === 'ios'
-              ? deviceOrientation.includes('PORTRAIT')
-                ? normalize(50)
-                : 0
-              : 0,
+          paddingTop: checkStatusBar(),
         },
       ]}>
-      {/* <View style={styles.videoContainer}> */}
-      {/* <StatusBar  /> */}
       <VideoPlayerComponent videoUrl={showVideo} />
-      {/* </View> */}
       <View>
         <FlatList
           data={data}
@@ -203,7 +175,7 @@ const VideoPlayer = ({route}: any) => {
   );
 };
 
-export default VideoPlayer;
+export default React.memo(VideoPlayer);
 
 const styles = StyleSheet.create({
   container: {
@@ -212,7 +184,6 @@ const styles = StyleSheet.create({
   videoContainer: {
     width: windowWidth,
     height: normalize(200),
-    // borderWidth: 1,
     alignSelf: 'center',
   },
   listHeaderView: {

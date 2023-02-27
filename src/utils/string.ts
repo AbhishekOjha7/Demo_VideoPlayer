@@ -12,6 +12,7 @@ export const STRINGS = {
     comments: 'Comments',
     totalCommnets: '32',
     Similar: 'Similar Videos',
+    Length: '5:30',
   },
   TOPTAB: {
     Channels: 'Channels',

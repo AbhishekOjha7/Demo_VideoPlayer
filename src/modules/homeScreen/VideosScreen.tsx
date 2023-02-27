@@ -19,19 +19,19 @@ import {STRINGS} from '../../utils/string';
 import {VideoShimmerContent} from '../../components/customShimmerEffetct';
 
 const VideosScreen = () => {
+  const [loading, setLoading] = React.useState(true);
   const [data, setData] = React.useState(videos.slice(0, 3));
   const navigation = useNavigation<any>();
 
-  /**
-   * @addData for implement pagination
-   */
-
-  const [loading, setLoading] = React.useState(true);
   useEffect(() => {
     setTimeout(() => {
       setLoading(false);
     }, 1000);
   }, []);
+
+  /**
+   * @addData for implement pagination
+   */
 
   const addData = () => {
     if (videos.length != data.length) {

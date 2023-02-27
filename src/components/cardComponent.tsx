@@ -12,7 +12,7 @@ interface customCardType {
   title: string;
   subtitle?: string;
   description?: string;
-  onPress?: any;
+  onPress?: () => void;
   sources?: string;
   duration?: string;
 }
@@ -32,22 +32,8 @@ const CardComponent = (props: customCardType) => {
           source={{uri: thumb}}
         />
         <Image source={localimages.playIcon} style={styles.pauseIcon} />
-        <View
-          style={{
-            position: 'absolute',
-            backgroundColor: '#5C3817',
-            // backgroundColor: 'black',
-            justifyContent: 'center',
-            padding: 6,
-            width: 60,
-            height: 30,
-            right: 10,
-            bottom: 10,
-            alignItems: 'center',
-            opacity: 0.6,
-            borderRadius: 8,
-          }}>
-          <Text style={{color: COLOR.WHITE, opacity: 1}}>{'5:30'}</Text>
+        <View style={styles.videolengthView}>
+          <Text style={styles.lengthText}>{STRINGS.LABEL.Length}</Text>
         </View>
       </View>
       <View style={styles.headerView}>
@@ -64,7 +50,7 @@ const CardComponent = (props: customCardType) => {
   );
 };
 
-export default React.memo(CardComponent);
+export default CardComponent;
 
 const styles = StyleSheet.create({
   cardImg: {
@@ -132,5 +118,23 @@ const styles = StyleSheet.create({
     borderRadius: normalize(15),
     height: normalize(30),
     width: normalize(30),
+  },
+  videolengthView: {
+    position: 'absolute',
+    backgroundColor: '#161616',
+    justifyContent: 'center',
+    padding: normalize(6),
+    width: normalize(60),
+    height: normalize(30),
+    right: normalize(10),
+    bottom: normalize(10),
+    alignItems: 'center',
+    opacity: 0.6,
+    borderRadius: normalize(7),
+  },
+  lengthText: {
+    color: COLOR.WHITE,
+    // opacity: 1,
+    fontFamily: fonts.MEDIUM,
   },
 });

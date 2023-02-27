@@ -2,38 +2,35 @@ import {
   Dimensions,
   Image,
   Platform,
-  SafeAreaView,
-  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
+import {COLOR} from '../utils/color';
 import Video from 'react-native-video';
 import {normalize} from '../utils/dimensions';
 import localimages from '../utils/localimages';
+import secondsToHHMMSS from '../utils/getDuration';
+import {VideoShimmer} from './customShimmerEffetct';
 import Slider from '@react-native-community/slider';
-import {COLOR} from '../utils/color';
+import React, {useEffect, useRef, useState} from 'react';
 import Orientation from 'react-native-orientation-locker';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
-import secondsToHHMMSS from '../utils/getDuration';
-import {VideoShimmer, VideoShimmerContent} from './customShimmerEffetct';
-
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 const videoRef = React.createRef<any>();
-
 const VideoPlayerComponent = ({videoUrl}: any) => {
+  const isFocused = useIsFocused();
+  const timeoutRef = useRef<any>([]);
   const [play, setPlay] = useState(true);
-  const [showControl, setShowControl] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
+  const navigation = useNavigation<any>();
   const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [loading, setLoading] = React.useState(true);
+  const [showControl, setShowControl] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [currOrientation, setOrientation] = useState('PORTRAIT');
-  const navigation = useNavigation<any>();
-  const [loading, setLoading] = React.useState(true);
-  const isFocused = useIsFocused();
 
   useEffect(() => {
     setTimeout(() => {
@@ -43,7 +40,6 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
 
   useEffect(() => {
     Orientation.getOrientation(orientation => {
-      console.log(orientation.includes('LANDSCAPE'));
       if (orientation.includes('LANDSCAPE')) {
         Orientation.lockToPortrait();
       }
@@ -58,6 +54,10 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
     return !play;
   };
 
+  /**
+   * @handleFullScreen is used for orientation of the screen setfullScreen
+   */
+
   const handleFullScreen = () => {
     setFullscreen(!fullscreen);
     if (currOrientation.includes('LANDSCAPE')) {
@@ -67,32 +67,54 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
     }
   };
 
+  /**
+   * @handlePlay is used for pause and play when pause the video controls also show on the screen
+   */
   const handlePlay = () => {
-    setPlay(!play);
-    handleIcons();
-    if (play === true) {
-      setShowControl(true);
-      setTimeout(() => {
-        setShowControl(false);
-      }, 1000);
-      return;
-    }
+    clerTimeOut();
+    setPlay(prev => {
+      if (prev === true) {
+      } else {
+        const timeout2 = setTimeout(() => {
+          setShowControl(false);
+        }, 3000);
+        timeoutRef.current.push(timeout2);
+      }
+      return !play;
+    });
   };
+  /**
+   * @skipBackward is used for move 10 sec back and show the controls
+   */
   const skipBackward = () => {
+    clerTimeOut();
     videoRef?.current?.seek(currentTime - 10);
     setCurrentTime(currentTime - 10);
+    const timeout4 = setTimeout(() => {
+      setShowControl(false);
+    }, 3000);
+    timeoutRef.current.push(timeout4);
   };
 
   const skipForward = () => {
+    clerTimeOut();
     videoRef?.current?.seek(currentTime + 10);
     setCurrentTime(currentTime + 10);
+    const timeout5 = setTimeout(() => {
+      setShowControl(false);
+    }, 3000);
+    timeoutRef.current.push(timeout5);
   };
 
+  /**
+   * @onEnd is used for playing video true and when video is completed start the video again
+   */
   const onEnd = () => {
     setPlay(true);
     videoRef.current.seek(0);
     setCurrentTime(0);
   };
+
   const onProgress = (data: any) => {
     setCurrentTime(data.currentTime);
   };
@@ -100,8 +122,15 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
     setDuration(obj.duration);
     setCurrentTime(obj.currentTime);
   };
+  /**
+   * @handleIcons is used for show controls the videoPlayer screen when touch the screen
+   */
   const handleIcons = () => {
     setShowControl(true);
+    const timeout1 = setTimeout(() => {
+      setShowControl(false);
+    }, 3000);
+    timeoutRef.current.push(timeout1);
   };
 
   const goBack = () => {
@@ -110,10 +139,28 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
       navigation.goBack();
     }, 0);
   };
-
+  /**
+   * @NavigateBack is used for go back and lock the screen in potrait
+   */
   const NavigateBack = () => {
     Orientation.lockToPortrait();
     fullscreen ? setFullscreen(false) : goBack();
+  };
+  const clerTimeOut = () => {
+    while (timeoutRef.current.length > 0) {
+      clearTimeout(timeoutRef.current.pop());
+    }
+  };
+  const _onSlidingComplete = (value: any) => {
+    value = Array.isArray(value) ? value[0] : value;
+    setCurrentTime(value);
+    videoRef?.current?.seek(value);
+    if (play) {
+      const timeout3 = setTimeout(() => {
+        setShowControl(false);
+      }, 3000);
+      timeoutRef.current.push(timeout3);
+    }
   };
 
   return (
@@ -182,11 +229,10 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
             minimumTrackTintColor={COLOR.lIGHTGREEN}
             maximumTrackTintColor={COLOR.WHITE}
             thumbTintColor={COLOR.lIGHTGREEN}
-            onSlidingComplete={value => {
-              value = Array.isArray(value) ? value[0] : value;
-              setCurrentTime(value);
-              videoRef?.current?.seek(value);
+            onSlidingStart={() => {
+              clerTimeOut();
             }}
+            onSlidingComplete={_onSlidingComplete}
           />
 
           <View style={styles.timerView}>
@@ -247,7 +293,7 @@ const styles = StyleSheet.create({
     height: normalize(35),
     width: '100%',
     alignSelf: 'center',
-    bottom: -10,
+    bottom: normalize(-10),
   },
   leftIcon: {
     width: normalize(30),
@@ -258,14 +304,14 @@ const styles = StyleSheet.create({
   backicon: {
     height: normalize(30),
     width: normalize(30),
-    left: 10,
-    top: 10,
-    tintColor: 'white',
+    left: normalize(10),
+    top: normalize(10),
+    tintColor: COLOR.WHITE,
   },
   sliderStyle: {
     alignSelf: 'center',
     width: '90%',
-    bottom: 6,
+    bottom: normalize(6),
     marginTop: Platform.OS == 'ios' ? '8%' : '12%',
   },
   timerView: {
@@ -275,8 +321,8 @@ const styles = StyleSheet.create({
   fullScreenView: {
     width: normalize(25),
     alignSelf: 'flex-end',
-    bottom: 20,
-    right: 10,
+    bottom: normalize(20),
+    right: normalize(10),
     height: normalize(25),
   },
   expandIcon: {
@@ -288,7 +334,6 @@ const styles = StyleSheet.create({
     flex: 1,
     height: height,
     width: width,
-    // backgroundColor: 'green',
     borderWidth: 1,
     zIndex: 1,
   },
