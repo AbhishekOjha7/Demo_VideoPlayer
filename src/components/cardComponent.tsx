@@ -1,11 +1,9 @@
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
-import {normalize, screenWidth, vh} from '../utils/dimensions';
+import {normalize} from '../utils/dimensions';
 import {COLOR} from '../utils/color';
 import localimages from '../utils/localimages';
-import {useNavigation} from '@react-navigation/native';
 import fonts from '../utils/fonts';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {STRINGS} from '../utils/string';
 interface customCardType {
   thumb: string;

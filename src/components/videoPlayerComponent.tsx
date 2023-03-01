@@ -115,10 +115,16 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
     setCurrentTime(0);
   };
 
+  /**
+   * @onProgress callback function this function called every progress update
+   */
   const onProgress = useCallback((data: any) => {
     setCurrentTime(data.currentTime);
   }, []);
 
+  /**
+   * @onLoad this callBackfunction is called when video is loaded and ready to play
+   */
   const onLoad = useCallback((obj: any) => {
     setDuration(obj.duration);
     setCurrentTime(obj.currentTime);
@@ -147,11 +153,17 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
     Orientation.lockToPortrait();
     fullscreen ? setFullscreen(false) : goBack();
   };
+  /**
+   * @clearTimeOut  function  clears the timeout  by the setTimeout()function before that.
+   */
   const clerTimeOut = () => {
     while (timeoutRef.current.length > 0) {
       clearTimeout(timeoutRef.current.pop());
     }
   };
+  /**
+   * @__onSlidingComplete callback is used when we scroll the slidebar it consist current value of the slider
+   */
   const _onSlidingComplete = (value: any) => {
     value = Array.isArray(value) ? value[0] : value;
     setCurrentTime(value);
