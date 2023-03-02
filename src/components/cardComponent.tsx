@@ -1,4 +1,11 @@
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Image,
+  ImageSourcePropType,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React from 'react';
 import {normalize} from '../utils/dimensions';
 import {COLOR} from '../utils/color';
@@ -13,16 +20,27 @@ interface customCardType {
   onPress?: () => void;
   sources?: string;
   duration?: string;
+  totalView?: string;
+  uploadedAt?: string;
+  channelIcon: ImageSourcePropType;
 }
 
 /**
  * CardComponet render card
  */
 
-const CardComponent = (props: customCardType) => {
-  const {thumb, title, subtitle} = props;
+const CardComponent = ({
+  thumb,
+  title,
+  subtitle,
+  onPress,
+  duration,
+  totalView,
+  uploadedAt,
+  channelIcon,
+}: customCardType) => {
   return (
-    <TouchableOpacity onPress={props.onPress} style={styles.carcContainer}>
+    <TouchableOpacity onPress={onPress} style={styles.carcContainer}>
       <View style={styles.thumbView}>
         <Image
           resizeMode="cover"
@@ -31,16 +49,16 @@ const CardComponent = (props: customCardType) => {
         />
         <Image source={localimages.playIcon} style={styles.pauseIcon} />
         <View style={styles.videolengthView}>
-          <Text style={styles.lengthText}>{STRINGS.LABEL.Length}</Text>
+          <Text style={styles.lengthText}>{duration}</Text>
         </View>
       </View>
       <View style={styles.headerView}>
         <Text style={styles.titleTxt}>{title}</Text>
         <Text style={styles.viewsTxt}>
-          {STRINGS.LABEL.views} {STRINGS.LABEL.unicode} {STRINGS.LABEL.days}
+          {totalView} {STRINGS.LABEL.unicode} {uploadedAt}
         </Text>
         <View style={styles.userView}>
-          <Image style={styles.userIcon} source={localimages.girlIcon} />
+          <Image style={styles.userIcon} source={channelIcon} />
           <Text style={styles.userNameStyle}>{subtitle}</Text>
         </View>
       </View>
@@ -48,7 +66,7 @@ const CardComponent = (props: customCardType) => {
   );
 };
 
-export default CardComponent;
+export default React.memo(CardComponent);
 
 const styles = StyleSheet.create({
   cardImg: {

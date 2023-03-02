@@ -5,6 +5,8 @@ import {useNavigation} from '@react-navigation/native';
 import CardComponent from '../../components/cardComponent';
 import {ActivityIndicator, FlatList, StyleSheet} from 'react-native';
 import {VideoShimmerContent} from '../../components/customShimmerEffetct';
+import { STRINGS } from '../../utils/string';
+import localimages from '../../utils/localimages';
 
 const VideosScreen = () => {
   const [loading, setLoading] = React.useState(true);
@@ -52,6 +54,10 @@ const VideosScreen = () => {
             title={item?.title}
             subtitle={item?.subtitle}
             description={item?.description}
+            duration={STRINGS.LABEL.Length}
+            totalView={STRINGS.LABEL.views}
+            uploadedAt={STRINGS.LABEL.days}
+            channelIcon={localimages.girlIcon}
           />
         )}
       </React.Fragment>

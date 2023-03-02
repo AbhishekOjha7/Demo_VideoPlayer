@@ -78,6 +78,7 @@ const VideoPlayer = ({route}: any) => {
             title={item?.title}
             subtitle={item?.subtitle}
             description={item?.description}
+            channelIcon={localimages.girlIcon}
           />
         )}
       </React.Fragment>
@@ -192,6 +193,7 @@ const VideoPlayer = ({route}: any) => {
           style={styles.FlatListStyle}
           contentContainerStyle={styles.contentContainerStyle}
           renderItem={onRender}
+           keyExtractor={(item,index)=>index.toString()}
           ListHeaderComponent={_listHeaderComponent}
         />
       </View>

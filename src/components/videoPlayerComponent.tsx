@@ -1,8 +1,6 @@
 import {
   ActivityIndicator,
-  Dimensions,
   Image,
-  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -30,7 +28,6 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
   const [showControl, setShowControl] = useState(false);
   const [buffer, setBuffer] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
-  const [currOrientation, setOrientation] = useState('PORTRAIT');
 
   useEffect(() => {
     setTimeout(() => {
@@ -39,15 +36,21 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
   }, []);
 
   useEffect(() => {
-    Orientation.getOrientation(orientation => {
-      if (orientation.includes('LANDSCAPE')) {
-        Orientation.lockToPortrait();
+    Orientation.addDeviceOrientationListener(orientation=>{
+      if(orientation==='PORTRAIT'){
+       setFullscreen(false)
+      }else{
+        setFullscreen(true)
+        Orientation.unlockAllOrientations();
+      }
+    })
+    return () => {
+      Orientation.lockToPortrait();
+    Orientation.removeDeviceOrientationListener(orientation => {
+      if (orientation === 'PORTRAIT') {
+      setFullscreen(false)
       }
     });
-    Orientation.addLockListener(orientation => setOrientation(orientation));
-    return () => {
-      Orientation.unlockAllOrientations();
-      Orientation.removeLockListener(handleFullScreen);
     };
   }, []);
 
@@ -60,12 +63,12 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
    */
 
   const handleFullScreen = () => {
-    setFullscreen(!fullscreen);
-    if (currOrientation.includes('LANDSCAPE')) {
+    if(!fullscreen){
+      Orientation.lockToLandscape()
+    }else{
       Orientation.lockToPortrait();
-    } else {
-      Orientation.lockToLandscape();
     }
+    setFullscreen(!fullscreen);
   };
 
   /**
@@ -118,16 +121,16 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
   /**
    * @onProgress callback function this function called every progress update
    */
-  const onProgress = useCallback((data: any) => {
-    setCurrentTime(data.currentTime);
+  const onProgress = useCallback(({currentTime}: {currentTime:number} ) => {
+    setCurrentTime(currentTime);
   }, []);
 
   /**
    * @onLoad this callBackfunction is called when video is loaded and ready to play
    */
-  const onLoad = useCallback((obj: any) => {
-    setDuration(obj.duration);
-    setCurrentTime(obj.currentTime);
+  const onLoad = useCallback(({duration,currentTime}: {duration : number,currentTime : number}) => {
+    setDuration(duration);
+    setCurrentTime(currentTime);
   }, []);
   /**
    * @handleIcons is used for show controls the videoPlayer screen when touch the screen
@@ -164,7 +167,7 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
   /**
    * @__onSlidingComplete callback is used when we scroll the slidebar it consist current value of the slider
    */
-  const _onSlidingComplete = (value: any) => {
+  const _onSlidingComplete = (value: number) => {
     value = Array.isArray(value) ? value[0] : value;
     setCurrentTime(value);
     videoRef?.current?.seek(value);
@@ -175,7 +178,7 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
       timeoutRef.current.push(timeout3);
     }
   };
-  const _onBuffer = ({isBuffering}: any) => {
+  const _onBuffer = ({isBuffering}: {isBuffering:boolean}) => {
     setBuffer(isBuffering);
   };
   return (
@@ -248,9 +251,7 @@ const VideoPlayerComponent = ({videoUrl}: any) => {
               minimumTrackTintColor={COLOR.lIGHTGREEN}
               maximumTrackTintColor={COLOR.WHITE}
               thumbTintColor={COLOR.lIGHTGREEN}
-              onSlidingStart={() => {
-                clerTimeOut();
-              }}
+              onSlidingStart={clerTimeOut}
               onSlidingComplete={_onSlidingComplete}
             />
             <View>
